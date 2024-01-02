@@ -1,0 +1,212 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  Please do not modify or delete this stack.  This CloudFormation template
+  creates one IAM role and policy to enable the partner billing service.
+Parameters:
+  CURBucketName:
+    Type: String
+    Description: >-
+      Enter the S3 bucket name where AWS CUR historical billing data is stored.
+    MaxLength: '63'
+  CloudTrailBucketName:
+    Type: String
+    Description: >-
+      Optional: Enter the S3 bucket name where AWS CloudTrail logs are saved. If
+      CloudTrail is not enabled, please ignore this step.
+    MaxLength: '63'
+  ConfigBucketName:
+    Type: String
+    Description: >-
+      Optional: Enter the S3 bucket name where AWS Config logs are saved. If
+      Config is not enabled, please ignore this step.
+    MaxLength: '63'
+  ExternalID:
+    Type: String
+    Description: If Bytes have provided a different ExternalID please overwrite this.
+    Default: 16160bc0fbdbbca17d39cbeb5bd83f
+    MinLength: '30'
+    MaxLength: '30'
+Resources:
+  Policy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: CloudHealth-Policy
+      Description: Partner Billing and Reporting - CloudHealth
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'appstream:Describe*'
+              - 'appstream:List*'
+              - 'autoscaling:Describe*'
+              - 'cloudformation:ListStacks'
+              - 'cloudformation:ListStackResources'
+              - 'cloudformation:DescribeStacks'
+              - 'cloudformation:DescribeStackEvents'
+              - 'cloudformation:DescribeStackResources'
+              - 'cloudformation:GetTemplate'
+              - 'cloudfront:Get*'
+              - 'cloudfront:List*'
+              - 'cloudtrail:DescribeTrails'
+              - 'cloudtrail:GetEventSelectors'
+              - 'cloudtrail:ListTags'
+              - 'cloudwatch:Describe*'
+              - 'cloudwatch:Get*'
+              - 'cloudwatch:List*'
+              - 'config:Get*'
+              - 'config:Describe*'
+              - 'config:Deliver*'
+              - 'config:List*'
+              - 'cur:Describe*'
+              - 'dms:Describe*'
+              - 'dms:List*'
+              - 'dynamodb:DescribeTable'
+              - 'dynamodb:List*'
+              - 'ec2:Describe*'
+              - 'ec2:GetReservedInstancesExchangeQuote'
+              - 'ecs:List*'
+              - 'ecs:Describe*'
+              - 'elasticache:Describe*'
+              - 'elasticache:ListTagsForResource'
+              - 'elasticbeanstalk:Check*'
+              - 'elasticbeanstalk:Describe*'
+              - 'elasticbeanstalk:List*'
+              - 'elasticbeanstalk:RequestEnvironmentInfo'
+              - 'elasticbeanstalk:RetrieveEnvironmentInfo'
+              - 'elasticfilesystem:Describe*'
+              - 'elasticloadbalancing:Describe*'
+              - 'elasticmapreduce:Describe*'
+              - 'elasticmapreduce:List*'
+              - 'es:List*'
+              - 'es:Describe*'
+              - 'firehose:ListDeliveryStreams'
+              - 'firehose:DescribeDeliveryStream'
+              - 'firehose:ListTagsForDeliveryStream'
+              - 'iam:List*'
+              - 'iam:Get*'
+              - 'iam:GenerateCredentialReport'
+              - 'kinesis:Describe*'
+              - 'kinesis:List*'
+              - 'kms:DescribeKey'
+              - 'kms:GetKeyRotationStatus'
+              - 'kms:ListKeys'
+              - 'kms:ListResourceTags'
+              - 'lambda:List*'
+              - 'logs:Describe*'
+              - 'logs:ListTagsLogGroup'
+              - 'organizations:ListAccounts'
+              - 'organizations:ListTagsForResource'
+              - 'organizations:DescribeOrganization'
+              - 'redshift:Describe*'
+              - 'route53:Get*'
+              - 'route53:List*'
+              - 'rds:Describe*'
+              - 'rds:ListTagsForResource'
+              - 's3:GetBucketAcl'
+              - 's3:GetBucketLocation'
+              - 's3:GetBucketLogging'
+              - 's3:GetBucketPolicyStatus'
+              - 's3:GetBucketPublicAccessBlock'
+              - 's3:GetAccountPublicAccessBlock'
+              - 's3:GetBucketTagging'
+              - 's3:GetBucketVersioning'
+              - 's3:GetBucketWebsite'
+              - 's3:List*'
+              - 'sagemaker:Describe*'
+              - 'sagemaker:List*'
+              - 'savingsplans:DescribeSavingsPlans'
+              - 'sdb:GetAttributes'
+              - 'sdb:List*'
+              - 'ses:Get*'
+              - 'ses:List*'
+              - 'sns:Get*'
+              - 'sns:List*'
+              - 'sqs:GetQueueAttributes'
+              - 'sqs:ListQueues'
+              - 'storagegateway:List*'
+              - 'storagegateway:Describe*'
+              - 'workspaces:Describe*'
+              - 'eks:Describe*'
+              - 'eks:List*'
+              - 'fsx:Describe*'
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - 's3:Get*'
+              - 's3:List*'
+            Resource:
+              - 'Fn::Join':
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - Ref: CloudTrailBucketName
+              - 'Fn::Join':
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - Ref: CloudTrailBucketName
+                    - /*
+              - 'Fn::Join':
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - Ref: ConfigBucketName
+              - 'Fn::Join':
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - Ref: ConfigBucketName
+                    - /*
+              - 'Fn::Join':
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - Ref: CURBucketName
+              - 'Fn::Join':
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - Ref: CURBucketName
+                    - /*
+      Roles:
+        - Ref: CloudHealthReadOnlyRole
+  CloudHealthReadOnlyRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: CloudHealth-Role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: 'arn:aws:iam::454464851268:root'
+            Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId': 16160bc0fbdbbca17d39cbeb5bd83f
+          - Effect: Allow
+            Principal:
+              AWS: 'arn:aws:iam::454464851268:root'
+            Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId':
+                  Ref: ExternalID
+      Tags:
+      - Key: Region
+        Value: !Sub "${AWS::Region}"
+      - Key: CloudFormation
+        Value: 'True'
+Outputs:
+  ExternalID:
+    Value:
+      Ref: ExternalID
+  CUR:
+    Value:
+      Ref: CURBucketName
+  CloudTrailBucketName:
+    Value:
+      Ref: CloudTrailBucketName
+  ConfigBucketName:
+    Value:
+      Ref: ConfigBucketName
+  CloudHealthReadOnlyRole:
+    Value:
+      'Fn::GetAtt':
+        - CloudHealthReadOnlyRole
+        - Arn
